@@ -57,6 +57,34 @@ const META_FILE = join(DATA_DIR, 'meta.json');
 const YEAR = new Date().getFullYear();
 const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36';
 
+// CBF escudos are square jpgs with a white background/border, which looks
+// bad on our dark UI. ge.globo.com hosts transparent-background SVG crests
+// for the same clubs, keyed here by CBF club id — swapped in below when
+// available, falling back to the CBF jpg otherwise (e.g. newly promoted
+// clubs not yet in this map).
+const GE_GLOBO_ESCUDOS: Record<string, string> = {
+  '20001': 'https://s.sde.globo.com/media/organizations/2024/10/09/Corinthians_2024_Q4ahot4.svg', // Corinthians
+  '20002': 'https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg', // Palmeiras
+  '20005': 'https://s.sde.globo.com/media/organizations/2018/03/11/sao-paulo.svg', // São Paulo
+  '20007': 'https://s.sde.globo.com/media/organizations/2021/06/28/bragantino.svg', // Red Bull Bragantino
+  '20008': 'https://s.sde.globo.com/media/organizations/2018/03/12/santos.svg', // Santos FC
+  '20011': 'https://s.sde.globo.com/media/organizations/2018/03/11/internacional.svg', // Internacional
+  '20013': 'https://s.sde.globo.com/media/organizations/2018/03/12/gremio.svg', // Grêmio
+  '20014': 'https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg', // Fluminense
+  '20016': 'https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg', // Flamengo
+  '20018': 'https://s.sde.globo.com/media/organizations/2025/12/18/Vitoria_2025.svg', // Vitória
+  '20022': 'https://s.sde.globo.com/media/organizations/2021/02/25/Remo-PA.svg', // Remo
+  '20052': 'https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg', // Athletico Paranaense
+  '20086': 'https://s.sde.globo.com/media/organizations/2021/06/21/CHAPECOENSE-2018.svg', // Chapecoense
+  '20385': 'https://s.sde.globo.com/media/organizations/2026/07/17/MIrassol.svg', // Mirassol
+  '59849': 'https://s.sde.globo.com/media/organizations/2021/02/13/cruzeiro_2021.svg', // Cruzeiro
+  '60175': 'https://s.sde.globo.com/media/organizations/2019/02/04/botafogo-svg.svg', // Botafogo
+  '60646': 'https://s.sde.globo.com/media/organizations/2021/09/04/vasco_SVG.svg', // Vasco da Gama
+  '61377': 'https://s.sde.globo.com/media/organizations/2018/03/11/bahia.svg', // Bahia
+  '61590': 'https://s.sde.globo.com/media/organizations/2018/03/11/coritiba.svg', // Coritiba SAF
+  '62194': 'https://s.sde.globo.com/media/organizations/2018/03/10/atletico-mg.svg', // Atlético Mineiro
+};
+
 // cbf.com.br serves its leaf certificate without the intermediate CA, so
 // strict TLS clients (Node, curl) can't build the chain even though the
 // intermediate/root below are legitimate, publicly trusted Sectigo certs
@@ -227,8 +255,16 @@ async function main() {
     for (const jogo of jogos) {
       const { mandante, visitante } = jogo;
 
-      teams[mandante.id] ??= { id: mandante.id, name: mandante.nome, escudo: mandante.url_escudo };
-      teams[visitante.id] ??= { id: visitante.id, name: visitante.nome, escudo: visitante.url_escudo };
+      teams[mandante.id] ??= {
+        id: mandante.id,
+        name: mandante.nome,
+        escudo: GE_GLOBO_ESCUDOS[mandante.id] ?? mandante.url_escudo,
+      };
+      teams[visitante.id] ??= {
+        id: visitante.id,
+        name: visitante.nome,
+        escudo: GE_GLOBO_ESCUDOS[visitante.id] ?? visitante.url_escudo,
+      };
 
       matches.push({
         id: jogo.id_jogo,
