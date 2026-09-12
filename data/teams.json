@@ -16,12 +16,12 @@
   },
   "20007": {
     "id": "20007",
-    "name": "Red Bull Bragantino",
+    "name": "Bragantino",
     "escudo": "https://s.sde.globo.com/media/organizations/2021/06/28/bragantino.svg"
   },
   "20008": {
     "id": "20008",
-    "name": "Santos FC",
+    "name": "Santos",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/santos.svg"
   },
   "20011": {
@@ -56,7 +56,7 @@
   },
   "20052": {
     "id": "20052",
-    "name": "Athletico Paranaense",
+    "name": "Athletico",
     "escudo": "https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg"
   },
   "20086": {
@@ -81,7 +81,7 @@
   },
   "60646": {
     "id": "60646",
-    "name": "Vasco da Gama Saf",
+    "name": "Vasco",
     "escudo": "https://s.sde.globo.com/media/organizations/2021/09/04/vasco_SVG.svg"
   },
   "61377": {
@@ -91,12 +91,12 @@
   },
   "61590": {
     "id": "61590",
-    "name": "Coritiba SAF",
+    "name": "Coritiba",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/coritiba.svg"
   },
   "62194": {
     "id": "62194",
-    "name": "Atlético Mineiro",
+    "name": "Atlético",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/03/10/atletico-mg.svg"
   }
 }
