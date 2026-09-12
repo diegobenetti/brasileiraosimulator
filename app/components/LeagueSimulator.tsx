@@ -137,12 +137,14 @@ function MatchRow({
   score,
   initialScore,
   onScoreChange,
+  showDate = true,
 }: {
   match: MatchRecord;
   teams: Record<string, Team>;
   score: ScoreEntry;
   initialScore: ScoreEntry;
   onScoreChange: (side: 'home' | 'away', value: string) => void;
+  showDate?: boolean;
 }) {
   const home = teams[match.home];
   const away = teams[match.away];
@@ -170,9 +172,11 @@ function MatchRow({
         <span className="truncate text-sm">{away?.name ?? match.away}</span>
       </div>
 
-      <div className="w-20 shrink-0 text-right text-[10px] text-gray-500 hidden sm:block">
-        {formatMatchDate(match.date, match.time)}
-      </div>
+      {showDate && (
+        <div className="w-20 shrink-0 text-right text-[10px] text-gray-500 hidden sm:block">
+          {formatMatchDate(match.date, match.time)}
+        </div>
+      )}
     </div>
   );
 }
@@ -200,6 +204,9 @@ function RoundSection({
   });
   const isSimulated = matches.some((m) => matchIsModified(scores[m.id], initialScores[m.id]));
 
+  const half = Math.ceil(matches.length / 2);
+  const columns = [matches.slice(0, half), matches.slice(half)];
+
   return (
     <details open={defaultOpen} className="group bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
       <summary className="cursor-pointer select-none list-none flex items-center justify-between px-3 py-2 bg-gray-800/60 hover:bg-gray-800">
@@ -226,16 +233,21 @@ function RoundSection({
           </svg>
         </div>
       </summary>
-      <div>
-        {matches.map((m) => (
-          <MatchRow
-            key={m.id}
-            match={m}
-            teams={teams}
-            score={scores[m.id] ?? { home: '', away: '' }}
-            initialScore={initialScores[m.id]}
-            onScoreChange={(side, value) => onScoreChange(m.id, side, value)}
-          />
+      <div className="sm:grid sm:grid-cols-2 sm:divide-x sm:divide-gray-800/60">
+        {columns.map((col, i) => (
+          <div key={i}>
+            {col.map((m) => (
+              <MatchRow
+                key={m.id}
+                match={m}
+                teams={teams}
+                score={scores[m.id] ?? { home: '', away: '' }}
+                initialScore={initialScores[m.id]}
+                onScoreChange={(side, value) => onScoreChange(m.id, side, value)}
+                showDate={false}
+              />
+            ))}
+          </div>
         ))}
       </div>
     </details>
@@ -299,7 +311,7 @@ export function LeagueSimulator({
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <header className="sticky top-0 z-10 bg-gray-950/95 backdrop-blur border-b border-gray-800 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+      <header className="sticky top-0 z-10 bg-gray-950/95 backdrop-blur border-b border-gray-800 px-2 sm:px-4 py-3 flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-base font-bold tracking-tight truncate">Simulador Brasileirão {meta.year}</h1>
           <p className="text-xs text-gray-500">Rodada atual: {meta.currentRound} de {meta.totalRounds}</p>
@@ -315,7 +327,7 @@ export function LeagueSimulator({
         </button>
       </header>
 
-      <div className="max-w-[1100px] mx-auto px-3 sm:px-4 py-4 grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-4 items-start">
+      <div className="max-w-[1400px] mx-auto px-2 sm:px-3 py-4 grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-4 items-start">
         <div className="lg:sticky lg:top-[72px]">
           <StandingsTable standings={standings} teams={teams} />
         </div>
