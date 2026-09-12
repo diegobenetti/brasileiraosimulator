@@ -11,6 +11,7 @@ import {
   type StandingRow,
   type Team,
 } from '../lib/standings';
+import { DonateModal } from './DonateModal';
 
 interface Meta {
   year: number;
@@ -307,7 +308,7 @@ export function LeagueSimulator({
     setScores(initialScores);
   }
 
-  const rounds = Object.keys(matchesByRound).map(Number).sort((a, b) => a - b);
+  const rounds = Object.keys(matchesByRound).map(Number).sort((a, b) => b - a);
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -316,15 +317,18 @@ export function LeagueSimulator({
           <h1 className="text-base font-bold tracking-tight truncate">Simulador Brasileirão {meta.year}</h1>
           <p className="text-xs text-gray-500">Rodada atual: {meta.currentRound} de {meta.totalRounds}</p>
         </div>
-        <button
-          onClick={handleReset}
-          disabled={!hasAnySimulation}
-          className="flex items-center h-9 text-sm px-4 rounded-full border border-gray-600 text-gray-300 transition-all shrink-0
-            enabled:hover:border-white enabled:hover:text-white enabled:cursor-pointer
-            disabled:opacity-30 disabled:cursor-default"
-        >
-          Resetar
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <DonateModal />
+          <button
+            onClick={handleReset}
+            disabled={!hasAnySimulation}
+            className="flex items-center h-9 text-sm px-4 rounded-full border border-gray-600 text-gray-300 transition-all shrink-0
+              enabled:hover:border-white enabled:hover:text-white enabled:cursor-pointer
+              disabled:opacity-30 disabled:cursor-default"
+          >
+            Resetar
+          </button>
+        </div>
       </header>
 
       <div className="max-w-[1400px] mx-auto px-2 sm:px-3 py-4 grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-4 items-start">
