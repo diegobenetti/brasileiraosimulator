@@ -1,6 +1,7 @@
 export interface Team {
   id: string;
-  name: string;
+  originalName: string;
+  displayName: string;
   escudo: string;
 }
 

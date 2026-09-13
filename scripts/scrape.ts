@@ -1,4 +1,4 @@
-import { existsSync, writeFileSync, mkdirSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import * as https from 'https';
 import * as tls from 'tls';
@@ -7,7 +7,8 @@ import * as tls from 'tls';
 
 interface Team {
   id: string;
-  name: string;
+  originalName: string;
+  displayName: string;
   escudo: string;
 }
 
@@ -171,6 +172,16 @@ function ensureDirs() {
   if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
 }
 
+// Display names are hand-edited (e.g. shortened) after scraping, so re-runs
+// must not clobber them — only originalName is refreshed from the CBF API.
+function loadExistingDisplayNames(): Record<string, string> {
+  if (!existsSync(TEAMS_FILE)) return {};
+  const existing: Record<string, Team> = JSON.parse(readFileSync(TEAMS_FILE, 'utf-8'));
+  return Object.fromEntries(
+    Object.entries(existing).map(([id, team]) => [id, team.displayName]),
+  );
+}
+
 function httpGet(url: string, accept: string): Promise<string> {
   return new Promise((resolve, reject) => {
     https
@@ -244,6 +255,7 @@ async function main() {
   const { competitionId, currentRound, totalRounds } = await getCompetitionInfo(YEAR);
   console.log(`  competitionId=${competitionId} rodada atual=${currentRound}/${totalRounds}`);
 
+  const existingDisplayNames = loadExistingDisplayNames();
   const teams: Record<string, Team> = {};
   const matches: Match[] = [];
 
@@ -257,12 +269,14 @@ async function main() {
 
       teams[mandante.id] ??= {
         id: mandante.id,
-        name: mandante.nome,
+        originalName: mandante.nome,
+        displayName: existingDisplayNames[mandante.id] ?? mandante.nome,
         escudo: GE_GLOBO_ESCUDOS[mandante.id] ?? mandante.url_escudo,
       };
       teams[visitante.id] ??= {
         id: visitante.id,
-        name: visitante.nome,
+        originalName: visitante.nome,
+        displayName: existingDisplayNames[visitante.id] ?? visitante.nome,
         escudo: GE_GLOBO_ESCUDOS[visitante.id] ?? visitante.url_escudo,
       };
 

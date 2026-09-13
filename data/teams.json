@@ -1,102 +1,122 @@
 {
   "20001": {
     "id": "20001",
-    "name": "Corinthians",
+    "originalName": "Corinthians",
+    "displayName": "Corinthians",
     "escudo": "https://s.sde.globo.com/media/organizations/2024/10/09/Corinthians_2024_Q4ahot4.svg"
   },
   "20002": {
     "id": "20002",
-    "name": "Palmeiras",
+    "originalName": "Palmeiras",
+    "displayName": "Palmeiras",
     "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg"
   },
   "20005": {
     "id": "20005",
-    "name": "São Paulo",
+    "originalName": "São Paulo",
+    "displayName": "São Paulo",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/sao-paulo.svg"
   },
   "20007": {
     "id": "20007",
-    "name": "Red Bull Bragantino",
+    "originalName": "Red Bull Bragantino",
+    "displayName": "Bragantino",
     "escudo": "https://s.sde.globo.com/media/organizations/2021/06/28/bragantino.svg"
   },
   "20008": {
     "id": "20008",
-    "name": "Santos FC",
+    "originalName": "Santos FC",
+    "displayName": "Santos",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/santos.svg"
   },
   "20011": {
     "id": "20011",
-    "name": "Internacional",
+    "originalName": "Internacional",
+    "displayName": "Internacional",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/internacional.svg"
   },
   "20013": {
     "id": "20013",
-    "name": "Grêmio",
+    "originalName": "Grêmio",
+    "displayName": "Grêmio",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/gremio.svg"
   },
   "20014": {
     "id": "20014",
-    "name": "Fluminense",
+    "originalName": "Fluminense",
+    "displayName": "Fluminense",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg"
   },
   "20016": {
     "id": "20016",
-    "name": "Flamengo",
+    "originalName": "Flamengo",
+    "displayName": "Flamengo",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg"
   },
   "20018": {
     "id": "20018",
-    "name": "Vitória",
+    "originalName": "Vitória",
+    "displayName": "Vitória",
     "escudo": "https://s.sde.globo.com/media/organizations/2025/12/18/Vitoria_2025.svg"
   },
   "20022": {
     "id": "20022",
-    "name": "Remo",
+    "originalName": "Remo",
+    "displayName": "Remo",
     "escudo": "https://s.sde.globo.com/media/organizations/2021/02/25/Remo-PA.svg"
   },
   "20052": {
     "id": "20052",
-    "name": "Athletico Paranaense",
+    "originalName": "Athletico Paranaense",
+    "displayName": "Athletico",
     "escudo": "https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg"
   },
   "20086": {
     "id": "20086",
-    "name": "Chapecoense",
+    "originalName": "Chapecoense",
+    "displayName": "Chapecoense",
     "escudo": "https://s.sde.globo.com/media/organizations/2021/06/21/CHAPECOENSE-2018.svg"
   },
   "20385": {
     "id": "20385",
-    "name": "Mirassol",
+    "originalName": "Mirassol",
+    "displayName": "Mirassol",
     "escudo": "https://s.sde.globo.com/media/organizations/2026/07/17/MIrassol.svg"
   },
   "59849": {
     "id": "59849",
-    "name": "Cruzeiro",
+    "originalName": "Cruzeiro",
+    "displayName": "Cruzeiro",
     "escudo": "https://s.sde.globo.com/media/organizations/2021/02/13/cruzeiro_2021.svg"
   },
   "60175": {
     "id": "60175",
-    "name": "Botafogo",
+    "originalName": "Botafogo",
+    "displayName": "Botafogo",
     "escudo": "https://s.sde.globo.com/media/organizations/2019/02/04/botafogo-svg.svg"
   },
   "60646": {
     "id": "60646",
-    "name": "Vasco da Gama Saf",
+    "originalName": "Vasco da Gama Saf",
+    "displayName": "Vasco",
     "escudo": "https://s.sde.globo.com/media/organizations/2021/09/04/vasco_SVG.svg"
   },
   "61377": {
     "id": "61377",
-    "name": "Bahia",
+    "originalName": "Bahia",
+    "displayName": "Bahia",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/bahia.svg"
   },
   "61590": {
     "id": "61590",
-    "name": "Coritiba SAF",
+    "originalName": "Coritiba SAF",
+    "displayName": "Coritiba",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/coritiba.svg"
   },
   "62194": {
     "id": "62194",
-    "name": "Atlético Mineiro",
+    "originalName": "Atlético Mineiro",
+    "displayName": "Atlético",
     "escudo": "https://s.sde.globo.com/media/organizations/2018/03/10/atletico-mg.svg"
   }
 }

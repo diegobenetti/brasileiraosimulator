@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   computeStandings,
   matchIsModified,
@@ -102,7 +103,7 @@ function StandingsTable({
                   <td className="py-1.5 pl-2">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <Crest url={team?.escudo ?? ''} alt={row.teamId} />
-                      <span className="truncate">{team?.name ?? row.teamId}</span>
+                      <span className="truncate">{team?.displayName ?? row.teamId}</span>
                     </div>
                   </td>
                   <td className="text-center py-1.5">{row.played}</td>
@@ -158,7 +159,7 @@ function MatchRow({
       }`}
     >
       <div className="flex items-center gap-1.5 flex-1 min-w-0 justify-end text-right">
-        <span className="truncate text-sm">{home?.name ?? match.home}</span>
+        <span className="truncate text-sm">{home?.displayName ?? match.home}</span>
         <Crest url={home?.escudo ?? ''} alt={match.home} />
       </div>
 
@@ -170,7 +171,7 @@ function MatchRow({
 
       <div className="flex items-center gap-1.5 flex-1 min-w-0">
         <Crest url={away?.escudo ?? ''} alt={match.away} />
-        <span className="truncate text-sm">{away?.name ?? match.away}</span>
+        <span className="truncate text-sm">{away?.displayName ?? match.away}</span>
       </div>
 
       {showDate && (
@@ -255,6 +256,47 @@ function RoundSection({
   );
 }
 
+function ConfirmResetModal({
+  onConfirm,
+  onCancel,
+}: {
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={onCancel}
+    >
+      <div
+        className="relative w-full max-w-sm mx-4 bg-gray-900 border border-gray-700 rounded-2xl px-8 py-8 text-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-lg font-bold mb-2">Resetar simulação</h2>
+        <p className="text-gray-400 text-sm mb-6">
+          Isso vai apagar todos os placares simulados e voltar aos resultados reais. Essa ação não pode ser desfeita.
+        </p>
+
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={onCancel}
+            className="h-9 text-sm px-4 rounded-full border border-gray-600 text-gray-300 hover:border-white hover:text-white cursor-pointer transition-all"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            className="h-9 text-sm px-4 rounded-full bg-red-600 text-white hover:bg-red-500 cursor-pointer transition-all"
+          >
+            Resetar
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 // ── Main export ──────────────────────────────────────────────────────────────
 
 export function LeagueSimulator({
@@ -268,7 +310,47 @@ export function LeagueSimulator({
   initialScores: Scores;
   meta: Meta;
 }) {
+  const storageKey = `brasileirao-sim-${meta.year}`;
+
   const [scores, setScores] = useState<Scores>(initialScores);
+  const [hydrated, setHydrated] = useState(false);
+  const [confirmResetOpen, setConfirmResetOpen] = useState(false);
+
+  // Load any simulation saved from a previous visit, but let real results
+  // (now scraped in) always win over a stale simulated score.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        const saved: Scores = JSON.parse(raw);
+        const merged: Scores = {};
+        for (const m of matches) {
+          const isFinal = m.homeScore !== null && m.awayScore !== null;
+          merged[m.id] = isFinal ? initialScores[m.id] : (saved[m.id] ?? initialScores[m.id]);
+        }
+        // Restoring saved state after mount (not a flash-prone value like a
+        // date/theme) — patching the whole standings table via an inline
+        // script before hydration isn't worth reimplementing computeStandings in JS.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setScores(merged);
+        localStorage.setItem(storageKey, JSON.stringify(merged));
+      }
+    } catch {
+      // localStorage unavailable or corrupted — fall back to server data
+    }
+    setHydrated(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist every change, once initial hydration/merge has happened.
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(scores));
+    } catch {
+      // localStorage unavailable (e.g. private mode / quota) — ignore
+    }
+  }, [scores, hydrated, storageKey]);
 
   const hasAnySimulation = scoresAreModified(scores, initialScores);
 
@@ -305,7 +387,9 @@ export function LeagueSimulator({
   }
 
   function handleReset() {
+    // The persist effect below writes this cleared state to localStorage too.
     setScores(initialScores);
+    setConfirmResetOpen(false);
   }
 
   const rounds = Object.keys(matchesByRound).map(Number).sort((a, b) => b - a);
@@ -320,7 +404,7 @@ export function LeagueSimulator({
         <div className="flex items-center gap-2 shrink-0">
           <DonateModal />
           <button
-            onClick={handleReset}
+            onClick={() => setConfirmResetOpen(true)}
             disabled={!hasAnySimulation}
             className="flex items-center h-9 text-sm px-4 rounded-full border border-gray-600 text-gray-300 transition-all shrink-0
               enabled:hover:border-white enabled:hover:text-white enabled:cursor-pointer
@@ -330,6 +414,13 @@ export function LeagueSimulator({
           </button>
         </div>
       </header>
+
+      {confirmResetOpen && (
+        <ConfirmResetModal
+          onConfirm={handleReset}
+          onCancel={() => setConfirmResetOpen(false)}
+        />
+      )}
 
       <div className="max-w-[1400px] mx-auto px-2 sm:px-3 py-4 grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-4 items-start">
         <div className="lg:sticky lg:top-[72px]">
