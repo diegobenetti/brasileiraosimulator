@@ -2878,8 +2878,8 @@
     "away": "20007",
     "date": "2026-09-12",
     "time": "20:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 1
   },
   {
     "id": "832153",
@@ -2889,8 +2889,8 @@
     "away": "59849",
     "date": "2026-09-12",
     "time": "21:00",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 2,
+    "awayScore": 1
   },
   {
     "id": "832154",
@@ -2900,8 +2900,8 @@
     "away": "20005",
     "date": "2026-09-12",
     "time": "18:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 2,
+    "awayScore": 0
   },
   {
     "id": "832155",
@@ -2922,8 +2922,8 @@
     "away": "20014",
     "date": "2026-09-12",
     "time": "16:00",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 3,
+    "awayScore": 1
   },
   {
     "id": "832157",
@@ -2933,8 +2933,8 @@
     "away": "60646",
     "date": "2026-09-12",
     "time": "16:00",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 2
   },
   {
     "id": "832158",
@@ -2944,8 +2944,8 @@
     "away": "20052",
     "date": "2026-09-11",
     "time": "21:00",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 3,
+    "awayScore": 3
   },
   {
     "id": "832159",
@@ -2966,8 +2966,8 @@
     "away": "20011",
     "date": "2026-09-12",
     "time": "17:00",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 2
   },
   {
     "id": "832161",
