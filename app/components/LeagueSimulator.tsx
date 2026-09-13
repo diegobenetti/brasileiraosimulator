@@ -422,7 +422,7 @@ export function LeagueSimulator({
         />
       )}
 
-      <div className="max-w-[1400px] mx-auto px-2 sm:px-3 py-4 grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-4 items-start">
+      <div className="max-w-[1400px] mx-auto px-2 sm:px-3 py-4 grid grid-cols-1 lg:grid-cols-[480px_1fr] gap-4 items-start">
         <div className="lg:sticky lg:top-[72px]">
           <StandingsTable standings={standings} teams={teams} />
         </div>

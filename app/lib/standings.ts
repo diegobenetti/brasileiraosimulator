@@ -88,9 +88,9 @@ export function computeStandings(
   return Object.values(stats).sort(
     (a, b) =>
       b.points - a.points ||
+      b.won - a.won ||
       b.goalDifference - a.goalDifference ||
-      b.goalsFor - a.goalsFor ||
-      b.won - a.won,
+      b.goalsFor - a.goalsFor,
   );
 }
 
