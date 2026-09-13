@@ -16,9 +16,10 @@ export function DonateModal() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Doar"
-        className="flex items-center justify-center w-9 h-9 rounded-full border border-pink-800 text-lg transition-all hover:border-pink-400 hover:shadow-[0_0_10px_2px_rgba(236,72,153,0.4)] cursor-pointer"
+        className="donate-button flex items-center gap-1.5 h-9 pl-2.5 pr-3 sm:pr-3.5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 text-white transition-transform hover:scale-105 hover:from-pink-400 hover:to-rose-500 cursor-pointer"
       >
-        ❤️
+        <span className="donate-heart text-base leading-none">❤️</span>
+        <span className="hidden sm:inline text-sm font-medium">Apoie</span>
       </button>
 
       {open && createPortal(
