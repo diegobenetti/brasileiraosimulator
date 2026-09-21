@@ -15,11 +15,11 @@ export function DonateModal() {
     <>
       <button
         onClick={() => setOpen(true)}
-        aria-label="Doar"
-        className="donate-button flex items-center gap-1.5 h-9 pl-2.5 pr-3 sm:pr-3.5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 text-white transition-transform hover:scale-105 hover:from-pink-400 hover:to-rose-500 cursor-pointer"
+        aria-label="Me pague um café"
+        className="donate-button flex items-center gap-1.5 h-9 pl-4 pr-4 sm:pr-4.5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 text-white transition-transform hover:scale-105 hover:from-pink-400 hover:to-rose-500 cursor-pointer"
       >
-        <span className="donate-heart text-base leading-none">❤️</span>
-        <span className="hidden sm:inline text-sm font-medium">Apoie</span>
+        <span className="hidden sm:inline text-sm font-medium">Me pague um café</span>
+        <span className="donate-heart text-base leading-none">☕</span>
       </button>
 
       {open && createPortal(
@@ -38,9 +38,9 @@ export function DonateModal() {
               ✕
             </button>
 
-            <h2 className="text-lg font-bold mb-2">Apoie o projeto</h2>
+            <h2 className="text-lg font-bold mb-2">Me pague um café ☕</h2>
             <p className="text-gray-400 text-sm mb-6">
-              Se este simulador te ajuda a acompanhar o Brasileirão, considere fazer uma doação para manter o projeto no ar.
+              Se este simulador te ajuda a acompanhar o Brasileirão, que tal pagar um cafezinho para ajudar a manter o projeto no ar?
             </p>
 
             <div>
