@@ -392,7 +392,15 @@ export function LeagueSimulator({
     setConfirmResetOpen(false);
   }
 
-  const rounds = Object.keys(matchesByRound).map(Number).sort((a, b) => b - a);
+  const rounds = useMemo(() => {
+    const allRounds = Object.keys(matchesByRound).map(Number);
+    // Upcoming rounds go on top in chronological order; played rounds stay
+    // below in the existing newest-first order. CBF's own "current round"
+    // pointer (meta.currentRound) marks the last round already played.
+    const upcoming = allRounds.filter((r) => r > meta.currentRound).sort((a, b) => a - b);
+    const played = allRounds.filter((r) => r <= meta.currentRound).sort((a, b) => b - a);
+    return [...upcoming, ...played];
+  }, [matchesByRound, meta.currentRound]);
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -429,16 +437,24 @@ export function LeagueSimulator({
 
         <div className="flex flex-col gap-3">
           {rounds.map((round) => (
-            <RoundSection
+            <div
               key={round}
-              round={round}
-              matches={matchesByRound[round]}
-              teams={teams}
-              scores={scores}
-              initialScores={initialScores}
-              defaultOpen={round === defaultOpenRound}
-              onScoreChange={handleScoreChange}
-            />
+              className={
+                round === meta.totalRounds && meta.currentRound < meta.totalRounds
+                  ? 'pb-3 border-b-2 border-amber-500/60'
+                  : undefined
+              }
+            >
+              <RoundSection
+                round={round}
+                matches={matchesByRound[round]}
+                teams={teams}
+                scores={scores}
+                initialScores={initialScores}
+                defaultOpen={round === defaultOpenRound}
+                onScoreChange={handleScoreChange}
+              />
+            </div>
           ))}
         </div>
       </div>
