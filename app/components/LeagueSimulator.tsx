@@ -68,9 +68,13 @@ function ScoreInput({ value, onChange }: { value: string; onChange: (v: string) 
 function StandingsTable({
   standings,
   teams,
+  selectedTeam,
+  onSelectTeam,
 }: {
   standings: StandingRow[];
   teams: Record<string, Team>;
+  selectedTeam: string | null;
+  onSelectTeam: (teamId: string) => void;
 }) {
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
@@ -94,16 +98,22 @@ function StandingsTable({
             {standings.map((row, i) => {
               const team = teams[row.teamId];
               const position = i + 1;
+              const isSelected = selectedTeam === row.teamId;
               return (
                 <tr
                   key={row.teamId}
-                  className={`border-t border-gray-800 text-white ${zoneClass(position)}`}
+                  onClick={() => onSelectTeam(row.teamId)}
+                  className={`border-t border-gray-800 text-white cursor-pointer transition-colors ${zoneClass(position)} ${
+                    isSelected ? 'bg-blue-500/15' : 'hover:bg-gray-800/50'
+                  }`}
                 >
                   <td className="text-center py-1.5 text-gray-500">{position}</td>
                   <td className="py-1.5 pl-2">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <Crest url={team?.escudo ?? ''} alt={row.teamId} />
-                      <span className="truncate">{team?.displayName ?? row.teamId}</span>
+                      <span className={`truncate ${isSelected ? 'font-semibold text-blue-300' : ''}`}>
+                        {team?.displayName ?? row.teamId}
+                      </span>
                     </div>
                   </td>
                   <td className="text-center py-1.5">{row.played}</td>
@@ -137,29 +147,37 @@ function MatchRow({
   match,
   teams,
   score,
-  initialScore,
   onScoreChange,
   showDate = true,
+  selectedTeam,
+  suppressHighlightBg,
 }: {
   match: MatchRecord;
   teams: Record<string, Team>;
   score: ScoreEntry;
-  initialScore: ScoreEntry;
   onScoreChange: (side: 'home' | 'away', value: string) => void;
   showDate?: boolean;
+  selectedTeam?: string | null;
+  suppressHighlightBg?: boolean;
 }) {
   const home = teams[match.home];
   const away = teams[match.away];
-  const modified = matchIsModified(score, initialScore);
+
+  const isUnplayed = match.homeScore === null && match.awayScore === null;
+  const isHomeSelected = selectedTeam != null && match.home === selectedTeam;
+  const isAwaySelected = selectedTeam != null && match.away === selectedTeam;
+  const isHighlighted = isUnplayed && (isHomeSelected || isAwaySelected) && !suppressHighlightBg;
 
   return (
     <div
       className={`flex items-center gap-2 px-3 py-2 border-t border-gray-800/60 first:border-t-0 ${
-        modified ? 'bg-amber-500/5' : ''
+        isHighlighted ? 'bg-blue-500/10 ring-1 ring-inset ring-blue-500/30' : ''
       }`}
     >
       <div className="flex items-center gap-1.5 flex-1 min-w-0 justify-end text-right">
-        <span className="truncate text-sm">{home?.displayName ?? match.home}</span>
+        <span className={`truncate text-sm ${isHomeSelected ? 'font-semibold text-blue-300' : ''}`}>
+          {home?.displayName ?? match.home}
+        </span>
         <Crest url={home?.escudo ?? ''} alt={match.home} />
       </div>
 
@@ -171,7 +189,9 @@ function MatchRow({
 
       <div className="flex items-center gap-1.5 flex-1 min-w-0">
         <Crest url={away?.escudo ?? ''} alt={match.away} />
-        <span className="truncate text-sm">{away?.displayName ?? match.away}</span>
+        <span className={`truncate text-sm ${isAwaySelected ? 'font-semibold text-blue-300' : ''}`}>
+          {away?.displayName ?? match.away}
+        </span>
       </div>
 
       {showDate && (
@@ -190,7 +210,10 @@ function RoundSection({
   scores,
   initialScores,
   defaultOpen,
+  forceOpen,
+  onlySelectedTeam,
   onScoreChange,
+  selectedTeam,
 }: {
   round: number;
   matches: MatchRecord[];
@@ -198,21 +221,45 @@ function RoundSection({
   scores: Scores;
   initialScores: Scores;
   defaultOpen: boolean;
+  forceOpen?: boolean;
+  onlySelectedTeam?: boolean;
   onScoreChange: (matchId: string, side: 'home' | 'away', value: string) => void;
+  selectedTeam?: string | null;
 }) {
   const allPlayed = matches.every((m) => {
     const s = scores[m.id];
     return s && s.home !== '' && s.away !== '';
   });
   const isSimulated = matches.some((m) => matchIsModified(scores[m.id], initialScores[m.id]));
+  const hasSelectedTeamMatch =
+    selectedTeam != null &&
+    matches.some(
+      (m) => m.homeScore === null && m.awayScore === null && (m.home === selectedTeam || m.away === selectedTeam),
+    );
 
-  const half = Math.ceil(matches.length / 2);
-  const columns = [matches.slice(0, half), matches.slice(half)];
+  const displayedMatches = onlySelectedTeam
+    ? matches.filter((m) => m.home === selectedTeam || m.away === selectedTeam)
+    : matches;
+
+  const showTwoColumns = displayedMatches.length > 1;
+  const half = Math.ceil(displayedMatches.length / 2);
+  const columns = showTwoColumns ? [displayedMatches.slice(0, half), displayedMatches.slice(half)] : [displayedMatches];
 
   return (
-    <details open={defaultOpen} className="group bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-      <summary className="cursor-pointer select-none list-none flex items-center justify-between px-3 py-2 bg-gray-800/60 hover:bg-gray-800">
-        <span className="font-bold text-sm tracking-wide text-white">Rodada {round}</span>
+    <details
+      open={forceOpen || defaultOpen}
+      className="group bg-gray-900 border border-gray-800 rounded-xl overflow-hidden"
+    >
+      <summary
+        tabIndex={-1}
+        className="cursor-pointer select-none list-none flex items-center justify-between px-3 py-2 bg-gray-800/60 hover:bg-gray-800"
+      >
+        <span className="flex items-center gap-1.5 font-bold text-sm tracking-wide text-white">
+          Rodada {round}
+          {hasSelectedTeamMatch && (
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" title="Time selecionado joga nesta rodada" />
+          )}
+        </span>
         <div className="flex items-center gap-2">
           {isSimulated ? (
             <span className="text-[10px] font-semibold bg-amber-500 text-gray-950 px-2 py-0.5 rounded-full">
@@ -235,7 +282,7 @@ function RoundSection({
           </svg>
         </div>
       </summary>
-      <div className="sm:grid sm:grid-cols-2 sm:divide-x sm:divide-gray-800/60">
+      <div className={showTwoColumns ? 'sm:grid sm:grid-cols-2 sm:divide-x sm:divide-gray-800/60' : undefined}>
         {columns.map((col, i) => (
           <div key={i}>
             {col.map((m) => (
@@ -244,9 +291,10 @@ function RoundSection({
                 match={m}
                 teams={teams}
                 score={scores[m.id] ?? { home: '', away: '' }}
-                initialScore={initialScores[m.id]}
                 onScoreChange={(side, value) => onScoreChange(m.id, side, value)}
                 showDate={false}
+                selectedTeam={selectedTeam}
+                suppressHighlightBg={onlySelectedTeam}
               />
             ))}
           </div>
@@ -311,10 +359,42 @@ export function LeagueSimulator({
   meta: Meta;
 }) {
   const storageKey = `brasileirao-sim-${meta.year}`;
+  const teamStorageKey = 'brasileirao-sim-selected-team';
 
   const [scores, setScores] = useState<Scores>(initialScores);
   const [hydrated, setHydrated] = useState(false);
   const [confirmResetOpen, setConfirmResetOpen] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+  const [focusFutureRounds, setFocusFutureRounds] = useState(false);
+  // The toggle only makes sense while a team is highlighted, so ignore any
+  // leftover value once the team is cleared instead of the toggle unmounting mid-focus.
+  const focusActive = selectedTeam != null && focusFutureRounds;
+
+  // Restore the last highlighted team (kept across seasons/visits, unlike scores).
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(teamStorageKey);
+      if (saved && teams[saved]) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSelectedTeam(saved);
+      }
+    } catch {
+      // localStorage unavailable — ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (selectedTeam) {
+        localStorage.setItem(teamStorageKey, selectedTeam);
+      } else {
+        localStorage.removeItem(teamStorageKey);
+      }
+    } catch {
+      // localStorage unavailable — ignore
+    }
+  }, [selectedTeam]);
 
   // Load any simulation saved from a previous visit, but let real results
   // (now scraped in) always win over a stale simulated score.
@@ -392,6 +472,10 @@ export function LeagueSimulator({
     setConfirmResetOpen(false);
   }
 
+  function handleSelectTeam(teamId: string) {
+    setSelectedTeam((prev) => (prev === teamId ? null : teamId));
+  }
+
   const rounds = useMemo(() => {
     const allRounds = Object.keys(matchesByRound).map(Number);
     // Upcoming rounds go on top in chronological order; played rounds stay
@@ -410,6 +494,40 @@ export function LeagueSimulator({
           <p className="text-xs text-gray-500">Rodada atual: {meta.currentRound} de {meta.totalRounds}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {selectedTeam && (
+            <button
+              onClick={() => setSelectedTeam(null)}
+              className="flex items-center gap-1.5 h-9 text-sm pl-2 pr-3 rounded-full border border-blue-500/50 bg-blue-500/10 text-blue-300 hover:border-blue-400 hover:text-blue-200 cursor-pointer transition-all shrink-0"
+              title="Limpar destaque"
+            >
+              <Crest url={teams[selectedTeam]?.escudo ?? ''} alt={selectedTeam} />
+              <span className="truncate max-w-[96px]">{teams[selectedTeam]?.displayName ?? selectedTeam}</span>
+              <span aria-hidden="true">×</span>
+            </button>
+          )}
+          {selectedTeam && (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={focusFutureRounds}
+              onClick={() => setFocusFutureRounds((v) => !v)}
+              title="Abrir as rodadas futuras e mostrar só o jogo do time selecionado"
+              className="flex items-center gap-1.5 h-9 pl-3 pr-1.5 rounded-full border border-gray-600 text-gray-300 text-xs hover:border-white hover:text-white cursor-pointer transition-all shrink-0"
+            >
+              <span className="hidden sm:inline">Focar time</span>
+              <span
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
+                  focusFutureRounds ? 'bg-blue-500' : 'bg-gray-700'
+                }`}
+              >
+                <span
+                  className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                    focusFutureRounds ? 'translate-x-4' : 'translate-x-1'
+                  }`}
+                />
+              </span>
+            </button>
+          )}
           <DonateModal />
           <button
             onClick={() => setConfirmResetOpen(true)}
@@ -432,30 +550,41 @@ export function LeagueSimulator({
 
       <div className="max-w-[1400px] mx-auto px-2 sm:px-3 py-4 grid grid-cols-1 lg:grid-cols-[480px_1fr] gap-4 items-start">
         <div className="lg:sticky lg:top-[72px]">
-          <StandingsTable standings={standings} teams={teams} />
+          <StandingsTable
+            standings={standings}
+            teams={teams}
+            selectedTeam={selectedTeam}
+            onSelectTeam={handleSelectTeam}
+          />
         </div>
 
         <div className="flex flex-col gap-3">
-          {rounds.map((round) => (
-            <div
-              key={round}
-              className={
-                round === meta.totalRounds && meta.currentRound < meta.totalRounds
-                  ? 'pb-3 border-b-2 border-amber-500/60'
-                  : undefined
-              }
-            >
-              <RoundSection
-                round={round}
-                matches={matchesByRound[round]}
-                teams={teams}
-                scores={scores}
-                initialScores={initialScores}
-                defaultOpen={round === defaultOpenRound}
-                onScoreChange={handleScoreChange}
-              />
-            </div>
-          ))}
+          {rounds.map((round) => {
+            const isFutureRound = round > meta.currentRound;
+            return (
+              <div
+                key={round}
+                className={
+                  round === meta.totalRounds && meta.currentRound < meta.totalRounds
+                    ? 'pb-3 border-b-2 border-amber-500/60'
+                    : undefined
+                }
+              >
+                <RoundSection
+                  round={round}
+                  matches={matchesByRound[round]}
+                  teams={teams}
+                  scores={scores}
+                  initialScores={initialScores}
+                  defaultOpen={round === defaultOpenRound}
+                  forceOpen={focusActive && isFutureRound}
+                  onlySelectedTeam={focusActive && isFutureRound}
+                  onScoreChange={handleScoreChange}
+                  selectedTeam={selectedTeam}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
