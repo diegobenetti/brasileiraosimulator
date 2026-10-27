@@ -2229,8 +2229,8 @@
     "away": "20008",
     "date": "2026-10-02",
     "time": "20:00",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 2
   },
   {
     "id": "832093",
@@ -2262,8 +2262,8 @@
     "away": "20007",
     "date": "2026-10-03",
     "time": "18:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 0
   },
   {
     "id": "832096",
@@ -3087,8 +3087,8 @@
     "away": "61590",
     "date": "2026-10-08",
     "time": "21:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 4,
+    "awayScore": 0
   },
   {
     "id": "832172",
@@ -3098,8 +3098,8 @@
     "away": "60646",
     "date": "2026-10-07",
     "time": "20:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 2
   },
   {
     "id": "832173",
@@ -3109,8 +3109,8 @@
     "away": "20016",
     "date": "2026-10-08",
     "time": "19:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 2,
+    "awayScore": 2
   },
   {
     "id": "832174",
@@ -3120,8 +3120,8 @@
     "away": "61377",
     "date": "2026-10-08",
     "time": "21:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 0
   },
   {
     "id": "832175",
@@ -3131,8 +3131,8 @@
     "away": "20385",
     "date": "2026-10-07",
     "time": "19:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 1
   },
   {
     "id": "832176",
@@ -3142,8 +3142,8 @@
     "away": "20005",
     "date": "2026-10-07",
     "time": "21:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 2,
+    "awayScore": 0
   },
   {
     "id": "832177",
@@ -3153,8 +3153,8 @@
     "away": "20001",
     "date": "2026-10-07",
     "time": "19:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 2,
+    "awayScore": 1
   },
   {
     "id": "832178",
@@ -3164,8 +3164,8 @@
     "away": "62194",
     "date": "2026-10-08",
     "time": "20:00",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 2,
+    "awayScore": 2
   },
   {
     "id": "832179",
@@ -3175,8 +3175,8 @@
     "away": "20086",
     "date": "2026-10-07",
     "time": "20:00",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 4,
+    "awayScore": 0
   },
   {
     "id": "832180",
@@ -3186,8 +3186,8 @@
     "away": "20013",
     "date": "2026-10-07",
     "time": "19:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 1
   },
   {
     "id": "832181",
@@ -3197,8 +3197,8 @@
     "away": "20014",
     "date": "2026-10-11",
     "time": "17:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 0
   },
   {
     "id": "832182",
@@ -3207,9 +3207,9 @@
     "home": "60646",
     "away": "20022",
     "date": "2026-10-10",
-    "time": "17:00",
-    "homeScore": null,
-    "awayScore": null
+    "time": "18:00",
+    "homeScore": 0,
+    "awayScore": 0
   },
   {
     "id": "832183",
@@ -3219,8 +3219,8 @@
     "away": "20018",
     "date": "2026-10-10",
     "time": "21:00",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 2,
+    "awayScore": 1
   },
   {
     "id": "832184",
@@ -3230,8 +3230,8 @@
     "away": "20001",
     "date": "2026-10-11",
     "time": "17:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 4,
+    "awayScore": 1
   },
   {
     "id": "832185",
@@ -3241,8 +3241,8 @@
     "away": "59849",
     "date": "2026-10-12",
     "time": "21:00",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 4,
+    "awayScore": 2
   },
   {
     "id": "832186",
@@ -3252,8 +3252,8 @@
     "away": "20008",
     "date": "2026-10-11",
     "time": "16:00",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 2,
+    "awayScore": 1
   },
   {
     "id": "832187",
@@ -3263,8 +3263,8 @@
     "away": "20011",
     "date": "2026-10-11",
     "time": "17:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 1
   },
   {
     "id": "832188",
@@ -3272,10 +3272,10 @@
     "round": 30,
     "home": "61590",
     "away": "60175",
-    "date": "2026-10-11",
-    "time": "19:30",
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-12",
+    "time": "16:00",
+    "homeScore": 1,
+    "awayScore": 1
   },
   {
     "id": "832189",
@@ -3285,8 +3285,8 @@
     "away": "20385",
     "date": "2026-10-11",
     "time": "19:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 0
   },
   {
     "id": "832190",
@@ -3296,8 +3296,8 @@
     "away": "20052",
     "date": "2026-10-12",
     "time": "19:30",
-    "homeScore": null,
-    "awayScore": null
+    "homeScore": 1,
+    "awayScore": 4
   },
   {
     "id": "832191",
@@ -3305,10 +3305,10 @@
     "round": 31,
     "home": "20014",
     "away": "20008",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-18",
+    "time": "16:00",
+    "homeScore": 1,
+    "awayScore": 2
   },
   {
     "id": "832192",
@@ -3316,10 +3316,10 @@
     "round": 31,
     "home": "60175",
     "away": "20086",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-17",
+    "time": "18:00",
+    "homeScore": 1,
+    "awayScore": 0
   },
   {
     "id": "832193",
@@ -3327,10 +3327,10 @@
     "round": 31,
     "home": "20005",
     "away": "60646",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-17",
+    "time": "21:00",
+    "homeScore": 1,
+    "awayScore": 0
   },
   {
     "id": "832194",
@@ -3338,10 +3338,10 @@
     "round": 31,
     "home": "20001",
     "away": "20018",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-19",
+    "time": "20:00",
+    "homeScore": 1,
+    "awayScore": 1
   },
   {
     "id": "832195",
@@ -3349,10 +3349,10 @@
     "round": 31,
     "home": "20385",
     "away": "20011",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-16",
+    "time": "20:00",
+    "homeScore": 2,
+    "awayScore": 0
   },
   {
     "id": "832196",
@@ -3360,10 +3360,10 @@
     "round": 31,
     "home": "62194",
     "away": "61590",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-17",
+    "time": "18:30",
+    "homeScore": 1,
+    "awayScore": 0
   },
   {
     "id": "832197",
@@ -3371,10 +3371,10 @@
     "round": 31,
     "home": "20013",
     "away": "59849",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-18",
+    "time": "16:00",
+    "homeScore": 2,
+    "awayScore": 4
   },
   {
     "id": "832198",
@@ -3382,10 +3382,10 @@
     "round": 31,
     "home": "20052",
     "away": "20002",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-17",
+    "time": "19:30",
+    "homeScore": 0,
+    "awayScore": 2
   },
   {
     "id": "832199",
@@ -3393,10 +3393,10 @@
     "round": 31,
     "home": "61377",
     "away": "20016",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-18",
+    "time": "18:30",
+    "homeScore": 0,
+    "awayScore": 3
   },
   {
     "id": "832200",
@@ -3404,10 +3404,10 @@
     "round": 31,
     "home": "20022",
     "away": "20007",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-18",
+    "time": "19:30",
+    "homeScore": 1,
+    "awayScore": 1
   },
   {
     "id": "832201",
@@ -3415,10 +3415,10 @@
     "round": 32,
     "home": "20016",
     "away": "62194",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-26",
+    "time": "20:00",
+    "homeScore": 3,
+    "awayScore": 2
   },
   {
     "id": "832202",
@@ -3426,10 +3426,10 @@
     "round": 32,
     "home": "60646",
     "away": "20001",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-24",
+    "time": "18:30",
+    "homeScore": 3,
+    "awayScore": 2
   },
   {
     "id": "832203",
@@ -3437,10 +3437,10 @@
     "round": 32,
     "home": "20008",
     "away": "61377",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-24",
+    "time": "21:00",
+    "homeScore": 1,
+    "awayScore": 1
   },
   {
     "id": "832204",
@@ -3448,10 +3448,10 @@
     "round": 32,
     "home": "20002",
     "away": "20007",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-24",
+    "time": "18:30",
+    "homeScore": 2,
+    "awayScore": 0
   },
   {
     "id": "832205",
@@ -3459,10 +3459,10 @@
     "round": 32,
     "home": "20385",
     "away": "20005",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-24",
+    "time": "16:30",
+    "homeScore": 1,
+    "awayScore": 1
   },
   {
     "id": "832206",
@@ -3470,10 +3470,10 @@
     "round": 32,
     "home": "59849",
     "away": "20022",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-23",
+    "time": "20:00",
+    "homeScore": 1,
+    "awayScore": 0
   },
   {
     "id": "832207",
@@ -3481,10 +3481,10 @@
     "round": 32,
     "home": "20011",
     "away": "60175",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-24",
+    "time": "16:30",
+    "homeScore": 3,
+    "awayScore": 0
   },
   {
     "id": "832208",
@@ -3492,10 +3492,10 @@
     "round": 32,
     "home": "61590",
     "away": "20013",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-26",
+    "time": "19:30",
+    "homeScore": 0,
+    "awayScore": 1
   },
   {
     "id": "832209",
@@ -3503,10 +3503,10 @@
     "round": 32,
     "home": "20018",
     "away": "20052",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-24",
+    "time": "16:30",
+    "homeScore": 1,
+    "awayScore": 1
   },
   {
     "id": "832210",
@@ -3514,10 +3514,10 @@
     "round": 32,
     "home": "20086",
     "away": "20014",
-    "date": null,
-    "time": null,
-    "homeScore": null,
-    "awayScore": null
+    "date": "2026-10-24",
+    "time": "19:30",
+    "homeScore": 2,
+    "awayScore": 1
   },
   {
     "id": "832211",
@@ -3525,8 +3525,8 @@
     "round": 33,
     "home": "20014",
     "away": "20011",
-    "date": null,
-    "time": null,
+    "date": "2026-10-28",
+    "time": "19:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3536,8 +3536,8 @@
     "round": 33,
     "home": "60646",
     "away": "20016",
-    "date": null,
-    "time": null,
+    "date": "2026-10-29",
+    "time": "20:00",
     "homeScore": null,
     "awayScore": null
   },
@@ -3547,8 +3547,8 @@
     "round": 33,
     "home": "20008",
     "away": "20002",
-    "date": null,
-    "time": null,
+    "date": "2026-10-28",
+    "time": "19:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3558,8 +3558,8 @@
     "round": 33,
     "home": "20001",
     "away": "20385",
-    "date": null,
-    "time": null,
+    "date": "2026-10-30",
+    "time": "20:00",
     "homeScore": null,
     "awayScore": null
   },
@@ -3569,8 +3569,8 @@
     "round": 33,
     "home": "20007",
     "away": "20086",
-    "date": null,
-    "time": null,
+    "date": "2026-10-28",
+    "time": "19:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3580,8 +3580,8 @@
     "round": 33,
     "home": "62194",
     "away": "59849",
-    "date": null,
-    "time": null,
+    "date": "2026-10-29",
+    "time": "19:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3591,8 +3591,8 @@
     "round": 33,
     "home": "20013",
     "away": "20052",
-    "date": null,
-    "time": null,
+    "date": "2026-10-29",
+    "time": "21:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3602,8 +3602,8 @@
     "round": 33,
     "home": "61590",
     "away": "20018",
-    "date": null,
-    "time": null,
+    "date": "2026-10-31",
+    "time": "16:00",
     "homeScore": null,
     "awayScore": null
   },
@@ -3613,8 +3613,8 @@
     "round": 33,
     "home": "61377",
     "away": "20005",
-    "date": null,
-    "time": null,
+    "date": "2026-10-28",
+    "time": "21:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3624,8 +3624,8 @@
     "round": 33,
     "home": "20022",
     "away": "60175",
-    "date": null,
-    "time": null,
+    "date": "2026-10-28",
+    "time": "21:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3635,8 +3635,8 @@
     "round": 34,
     "home": "20016",
     "away": "20013",
-    "date": null,
-    "time": null,
+    "date": "2026-11-04",
+    "time": "19:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3646,8 +3646,8 @@
     "round": 34,
     "home": "60175",
     "away": "62194",
-    "date": null,
-    "time": null,
+    "date": "2026-11-04",
+    "time": "21:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3657,8 +3657,8 @@
     "round": 34,
     "home": "20005",
     "away": "20001",
-    "date": null,
-    "time": null,
+    "date": "2026-11-04",
+    "time": "21:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3668,8 +3668,8 @@
     "round": 34,
     "home": "20002",
     "away": "20022",
-    "date": null,
-    "time": null,
+    "date": "2026-11-05",
+    "time": "19:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3679,8 +3679,8 @@
     "round": 34,
     "home": "20007",
     "away": "20008",
-    "date": null,
-    "time": null,
+    "date": "2026-11-02",
+    "time": "20:00",
     "homeScore": null,
     "awayScore": null
   },
@@ -3690,8 +3690,8 @@
     "round": 34,
     "home": "59849",
     "away": "61377",
-    "date": null,
-    "time": null,
+    "date": "2026-11-05",
+    "time": "21:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3701,8 +3701,8 @@
     "round": 34,
     "home": "20011",
     "away": "61590",
-    "date": null,
-    "time": null,
+    "date": "2026-11-03",
+    "time": "21:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3712,8 +3712,8 @@
     "round": 34,
     "home": "20052",
     "away": "60646",
-    "date": null,
-    "time": null,
+    "date": "2026-11-04",
+    "time": "19:30",
     "homeScore": null,
     "awayScore": null
   },
@@ -3723,8 +3723,8 @@
     "round": 34,
     "home": "20018",
     "away": "20014",
-    "date": null,
-    "time": null,
+    "date": "2026-11-06",
+    "time": "20:00",
     "homeScore": null,
     "awayScore": null
   },
@@ -3734,8 +3734,8 @@
     "round": 34,
     "home": "20086",
     "away": "20385",
-    "date": null,
-    "time": null,
+    "date": "2026-11-03",
+    "time": "19:30",
     "homeScore": null,
     "awayScore": null
   },

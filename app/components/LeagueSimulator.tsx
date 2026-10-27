@@ -68,12 +68,12 @@ function ScoreInput({ value, onChange }: { value: string; onChange: (v: string) 
 function StandingsTable({
   standings,
   teams,
-  selectedTeam,
+  selectedTeams,
   onSelectTeam,
 }: {
   standings: StandingRow[];
   teams: Record<string, Team>;
-  selectedTeam: string | null;
+  selectedTeams: string[];
   onSelectTeam: (teamId: string) => void;
 }) {
   return (
@@ -98,7 +98,7 @@ function StandingsTable({
             {standings.map((row, i) => {
               const team = teams[row.teamId];
               const position = i + 1;
-              const isSelected = selectedTeam === row.teamId;
+              const isSelected = selectedTeams.includes(row.teamId);
               return (
                 <tr
                   key={row.teamId}
@@ -149,7 +149,7 @@ function MatchRow({
   score,
   onScoreChange,
   showDate = true,
-  selectedTeam,
+  selectedTeams = [],
   suppressHighlightBg,
 }: {
   match: MatchRecord;
@@ -157,15 +157,15 @@ function MatchRow({
   score: ScoreEntry;
   onScoreChange: (side: 'home' | 'away', value: string) => void;
   showDate?: boolean;
-  selectedTeam?: string | null;
+  selectedTeams?: string[];
   suppressHighlightBg?: boolean;
 }) {
   const home = teams[match.home];
   const away = teams[match.away];
 
   const isUnplayed = match.homeScore === null && match.awayScore === null;
-  const isHomeSelected = selectedTeam != null && match.home === selectedTeam;
-  const isAwaySelected = selectedTeam != null && match.away === selectedTeam;
+  const isHomeSelected = selectedTeams.includes(match.home);
+  const isAwaySelected = selectedTeams.includes(match.away);
   const isHighlighted = isUnplayed && (isHomeSelected || isAwaySelected) && !suppressHighlightBg;
 
   return (
@@ -213,7 +213,7 @@ function RoundSection({
   forceOpen,
   onlySelectedTeam,
   onScoreChange,
-  selectedTeam,
+  selectedTeams = [],
 }: {
   round: number;
   matches: MatchRecord[];
@@ -224,22 +224,19 @@ function RoundSection({
   forceOpen?: boolean;
   onlySelectedTeam?: boolean;
   onScoreChange: (matchId: string, side: 'home' | 'away', value: string) => void;
-  selectedTeam?: string | null;
+  selectedTeams?: string[];
 }) {
   const allPlayed = matches.every((m) => {
     const s = scores[m.id];
     return s && s.home !== '' && s.away !== '';
   });
   const isSimulated = matches.some((m) => matchIsModified(scores[m.id], initialScores[m.id]));
-  const hasSelectedTeamMatch =
-    selectedTeam != null &&
-    matches.some(
-      (m) => m.homeScore === null && m.awayScore === null && (m.home === selectedTeam || m.away === selectedTeam),
-    );
+  const involvesSelected = (m: MatchRecord) => selectedTeams.includes(m.home) || selectedTeams.includes(m.away);
+  const hasSelectedTeamMatch = matches.some(
+    (m) => m.homeScore === null && m.awayScore === null && involvesSelected(m),
+  );
 
-  const displayedMatches = onlySelectedTeam
-    ? matches.filter((m) => m.home === selectedTeam || m.away === selectedTeam)
-    : matches;
+  const displayedMatches = onlySelectedTeam ? matches.filter(involvesSelected) : matches;
 
   const showTwoColumns = displayedMatches.length > 1;
   const half = Math.ceil(displayedMatches.length / 2);
@@ -293,7 +290,7 @@ function RoundSection({
                 score={scores[m.id] ?? { home: '', away: '' }}
                 onScoreChange={(side, value) => onScoreChange(m.id, side, value)}
                 showDate={false}
-                selectedTeam={selectedTeam}
+                selectedTeams={selectedTeams}
                 suppressHighlightBg={onlySelectedTeam}
               />
             ))}
@@ -364,19 +361,22 @@ export function LeagueSimulator({
   const [scores, setScores] = useState<Scores>(initialScores);
   const [hydrated, setHydrated] = useState(false);
   const [confirmResetOpen, setConfirmResetOpen] = useState(false);
-  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+  const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
   const [focusFutureRounds, setFocusFutureRounds] = useState(false);
   // The toggle only makes sense while a team is highlighted, so ignore any
-  // leftover value once the team is cleared instead of the toggle unmounting mid-focus.
-  const focusActive = selectedTeam != null && focusFutureRounds;
+  // leftover value once the teams are cleared instead of the toggle unmounting mid-focus.
+  const focusActive = selectedTeams.length > 0 && focusFutureRounds;
 
-  // Restore the last highlighted team (kept across seasons/visits, unlike scores).
+  // Restore the last highlighted teams (kept across seasons/visits, unlike scores).
   useEffect(() => {
     try {
       const saved = localStorage.getItem(teamStorageKey);
-      if (saved && teams[saved]) {
+      if (saved) {
+        // Older visits stored a single team id as a plain string.
+        const parsed: unknown = saved.startsWith('[') ? JSON.parse(saved) : [saved];
+        const valid = Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string' && !!teams[id]) : [];
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setSelectedTeam(saved);
+        setSelectedTeams(valid);
       }
     } catch {
       // localStorage unavailable — ignore
@@ -386,15 +386,15 @@ export function LeagueSimulator({
 
   useEffect(() => {
     try {
-      if (selectedTeam) {
-        localStorage.setItem(teamStorageKey, selectedTeam);
+      if (selectedTeams.length > 0) {
+        localStorage.setItem(teamStorageKey, JSON.stringify(selectedTeams));
       } else {
         localStorage.removeItem(teamStorageKey);
       }
     } catch {
       // localStorage unavailable — ignore
     }
-  }, [selectedTeam]);
+  }, [selectedTeams]);
 
   // Load any simulation saved from a previous visit, but let real results
   // (now scraped in) always win over a stale simulated score.
@@ -473,7 +473,12 @@ export function LeagueSimulator({
   }
 
   function handleSelectTeam(teamId: string) {
-    setSelectedTeam((prev) => (prev === teamId ? null : teamId));
+    const next = selectedTeams.includes(teamId)
+      ? selectedTeams.filter((id) => id !== teamId)
+      : [...selectedTeams, teamId];
+    setSelectedTeams(next);
+    // Comparing teams is the point of picking a second one, so jump straight to focus mode.
+    if (next.length === 2 && selectedTeams.length === 1) setFocusFutureRounds(true);
   }
 
   const rounds = useMemo(() => {
@@ -494,24 +499,28 @@ export function LeagueSimulator({
           <p className="text-xs text-gray-500">Rodada atual: {meta.currentRound} de {meta.totalRounds}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {selectedTeam && (
+          {selectedTeams.length > 0 && (
             <button
-              onClick={() => setSelectedTeam(null)}
+              onClick={() => setSelectedTeams([])}
               className="flex items-center gap-1.5 h-9 text-sm pl-2 pr-3 rounded-full border border-blue-500/50 bg-blue-500/10 text-blue-300 hover:border-blue-400 hover:text-blue-200 cursor-pointer transition-all shrink-0"
-              title="Limpar destaque"
+              title={`Limpar destaque: ${selectedTeams.map((id) => teams[id]?.displayName ?? id).join(', ')}`}
             >
-              <Crest url={teams[selectedTeam]?.escudo ?? ''} alt={selectedTeam} />
-              <span className="truncate max-w-[96px]">{teams[selectedTeam]?.displayName ?? selectedTeam}</span>
+              {selectedTeams.map((id) => (
+                <Crest key={id} url={teams[id]?.escudo ?? ''} alt={teams[id]?.displayName ?? id} />
+              ))}
+              {selectedTeams.length === 1 && (
+                <span className="truncate max-w-[96px]">{teams[selectedTeams[0]]?.displayName ?? selectedTeams[0]}</span>
+              )}
               <span aria-hidden="true">×</span>
             </button>
           )}
-          {selectedTeam && (
+          {selectedTeams.length > 0 && (
             <button
               type="button"
               role="switch"
               aria-checked={focusFutureRounds}
               onClick={() => setFocusFutureRounds((v) => !v)}
-              title="Abrir as rodadas futuras e mostrar só o jogo do time selecionado"
+              title="Abrir as rodadas futuras e mostrar só os jogos dos times selecionados"
               className="flex items-center gap-1.5 h-9 pl-3 pr-1.5 rounded-full border border-gray-600 text-gray-300 text-xs hover:border-white hover:text-white cursor-pointer transition-all shrink-0"
             >
               <span className="hidden sm:inline">Focar time</span>
@@ -553,7 +562,7 @@ export function LeagueSimulator({
           <StandingsTable
             standings={standings}
             teams={teams}
-            selectedTeam={selectedTeam}
+            selectedTeams={selectedTeams}
             onSelectTeam={handleSelectTeam}
           />
         </div>
@@ -580,7 +589,7 @@ export function LeagueSimulator({
                   forceOpen={focusActive && isFutureRound}
                   onlySelectedTeam={focusActive && isFutureRound}
                   onScoreChange={handleScoreChange}
-                  selectedTeam={selectedTeam}
+                  selectedTeams={selectedTeams}
                 />
               </div>
             );
