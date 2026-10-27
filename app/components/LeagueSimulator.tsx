@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   computeStandings,
@@ -49,10 +49,19 @@ function Crest({ url, alt, className = 'w-6 h-6' }: { url: string; alt: string; 
   return <img src={url} alt={alt} className={`${className} object-contain shrink-0`} loading="lazy" />;
 }
 
-function ScoreInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function ScoreInput({
+  value,
+  onChange,
+  tabIndex,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  tabIndex?: number;
+}) {
   return (
     <input
       type="text"
+      tabIndex={tabIndex}
       inputMode="numeric"
       pattern="[0-9]*"
       maxLength={2}
@@ -182,9 +191,11 @@ function MatchRow({
       </div>
 
       <div className="flex items-center gap-1 shrink-0">
-        <ScoreInput value={score.home} onChange={(v) => onScoreChange('home', v)} />
+        {/* Matches with a real result stay editable by click/tap but are skipped by Tab,
+            so keyboard users jump straight through the games still to be decided. */}
+        <ScoreInput value={score.home} onChange={(v) => onScoreChange('home', v)} tabIndex={isUnplayed ? undefined : -1} />
         <span className="text-gray-600 text-xs select-none">×</span>
-        <ScoreInput value={score.away} onChange={(v) => onScoreChange('away', v)} />
+        <ScoreInput value={score.away} onChange={(v) => onScoreChange('away', v)} tabIndex={isUnplayed ? undefined : -1} />
       </div>
 
       <div className="flex items-center gap-1.5 flex-1 min-w-0">
@@ -342,6 +353,103 @@ function ConfirmResetModal({
   );
 }
 
+// Owns its own open state so toggling it re-renders just the menu, not the
+// whole simulator (standings plus every round's score inputs), which is what
+// made the menu feel laggy on phones.
+function MobileMenu({
+  canReset,
+  onDonate,
+  onReset,
+}: {
+  canReset: boolean;
+  onDonate: () => void;
+  onReset: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Close on any tap outside the menu (on pointerdown, so it reacts
+  // immediately) or on Escape. A fixed backdrop can't do this: the header's
+  // backdrop-blur makes it the containing block, trapping the backdrop inside it.
+  useEffect(() => {
+    if (!open) return;
+    function onPointerDown(e: PointerEvent) {
+      const target = e.target as Node;
+      if (menuRef.current?.contains(target) || buttonRef.current?.contains(target)) return;
+      setOpen(false);
+    }
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [open]);
+
+  return (
+    <>
+      <button
+        type="button"
+        ref={buttonRef}
+        onClick={() => setOpen((v) => !v)}
+        aria-label="Menu"
+        aria-expanded={open}
+        className={`sm:hidden flex items-center justify-center h-9 w-9 rounded-full border touch-manipulation cursor-pointer shrink-0
+          transition-[transform,background-color,border-color,color] duration-150 active:scale-90 ${
+            open ? 'border-white/60 bg-gray-800 text-white' : 'border-gray-600 text-gray-300 active:bg-gray-800'
+          }`}
+      >
+        <svg
+          className={`w-4 h-4 transition-transform duration-200 ${open ? 'rotate-90' : ''}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeWidth={2} d={open ? 'M6 6l12 12M18 6L6 18' : 'M4 7h16M4 12h16M4 17h16'} />
+        </svg>
+      </button>
+      {/* Kept mounted so it can animate both in and out; outside taps close it (see effect). */}
+      <div
+        ref={menuRef}
+        aria-hidden={!open}
+        className={`sm:hidden absolute right-2 top-full mt-2 z-20 w-56 overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl
+          origin-top-right transition-[opacity,transform,visibility] duration-150 ease-out ${
+            open ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'
+          }`}
+      >
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(false);
+            onDonate();
+          }}
+          className="flex w-full items-center justify-between px-4 py-3 text-sm text-gray-200 touch-manipulation hover:bg-gray-800 active:bg-gray-700 cursor-pointer"
+        >
+          Me pague um café
+          <span aria-hidden="true">☕</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(false);
+            onReset();
+          }}
+          disabled={!canReset}
+          className="flex w-full items-center px-4 py-3 text-sm text-gray-200 border-t border-gray-800 touch-manipulation
+            enabled:hover:bg-gray-800 enabled:active:bg-gray-700 enabled:cursor-pointer disabled:opacity-30"
+        >
+          Resetar simulação
+        </button>
+      </div>
+    </>
+  );
+}
+
 // ── Main export ──────────────────────────────────────────────────────────────
 
 export function LeagueSimulator({
@@ -361,11 +469,15 @@ export function LeagueSimulator({
   const [scores, setScores] = useState<Scores>(initialScores);
   const [hydrated, setHydrated] = useState(false);
   const [confirmResetOpen, setConfirmResetOpen] = useState(false);
+  const [donateOpen, setDonateOpen] = useState(false);
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
   const [focusFutureRounds, setFocusFutureRounds] = useState(false);
   // The toggle only makes sense while a team is highlighted, so ignore any
   // leftover value once the teams are cleared instead of the toggle unmounting mid-focus.
   const focusActive = selectedTeams.length > 0 && focusFutureRounds;
+  const selectedTeamNames = selectedTeams.map((id) => teams[id]?.displayName ?? id).join(', ');
+  const [focusHint, setFocusHint] = useState({ text: '', visible: false });
+  const focusHintTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Restore the last highlighted teams (kept across seasons/visits, unlike scores).
   useEffect(() => {
@@ -472,13 +584,146 @@ export function LeagueSimulator({
     setConfirmResetOpen(false);
   }
 
+  // Touch screens get no tooltip, so briefly spell out what the filter now shows.
+  function showFocusHint(on: boolean) {
+    const text = on ? 'Próximas rodadas filtradas' : 'Mostrando todos os jogos';
+    setFocusHint({ text, visible: true });
+    clearTimeout(focusHintTimer.current);
+    focusHintTimer.current = setTimeout(() => setFocusHint((h) => ({ ...h, visible: false })), 2000);
+  }
+
+  function handleToggleFocus() {
+    const next = !focusActive;
+    setFocusFutureRounds(next);
+    showFocusHint(next);
+  }
+
   function handleSelectTeam(teamId: string) {
     const next = selectedTeams.includes(teamId)
       ? selectedTeams.filter((id) => id !== teamId)
       : [...selectedTeams, teamId];
     setSelectedTeams(next);
     // Comparing teams is the point of picking a second one, so jump straight to focus mode.
-    if (next.length === 2 && selectedTeams.length === 1) setFocusFutureRounds(true);
+    if (next.length === 2 && selectedTeams.length === 1 && !focusFutureRounds) {
+      setFocusFutureRounds(true);
+      showFocusHint(true);
+    }
+  }
+
+  // One pill for the whole selection: tapping the crests toggles the
+  // "only these teams' matches" filter (lit up with a glow when on),
+  // and the × behind the divider clears the selection. Rendered in the
+  // header on desktop and below the standings on mobile.
+  function renderTeamPill() {
+    return (
+      <div
+        className={`flex items-stretch h-9 rounded-full border text-sm transition-all duration-300 shrink-0 ${
+          focusActive
+            ? 'border-blue-500/50 bg-blue-500/10 text-blue-300 shadow-[0_0_14px_-2px_rgb(59_130_246/0.45)]'
+            : 'border-gray-700 text-gray-400'
+        }`}
+      >
+        <button
+          type="button"
+          aria-pressed={focusActive}
+          onClick={handleToggleFocus}
+          title={
+            focusActive
+              ? 'Mostrar todos os jogos'
+              : `Mostrar só os jogos de ${selectedTeamNames} nas próximas rodadas`
+          }
+          className={`group flex items-center gap-1.5 pl-2.5 pr-2 rounded-l-full cursor-pointer transition-colors ${
+            focusActive ? 'hover:text-blue-200' : 'hover:text-white'
+          }`}
+        >
+          <span
+            className={`flex items-center gap-1.5 transition-opacity duration-300 ${
+              focusActive ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'
+            }`}
+          >
+            {selectedTeams.length >= 3 ? (
+              // Overlap and fan the crests out like a hand of cards so many teams still fit.
+              // drop-shadow follows each crest's transparent silhouette: the tight dark
+              // shadows act as a die-cut outline separating overlapping crests, and the
+              // soft offset one falls onto the crest underneath to give the stack depth.
+              <span className="flex items-center -space-x-2">
+                {selectedTeams.map((id, i) => (
+                  <span
+                    key={id}
+                    className="inline-flex"
+                    style={{
+                      transform: `rotate(${(i - (selectedTeams.length - 1) / 2) * 8}deg)`,
+                      filter:
+                        'drop-shadow(0 0 0.5px rgb(3 7 18)) drop-shadow(0 0 0.5px rgb(3 7 18)) drop-shadow(-2px 1px 2px rgb(0 0 0 / 0.55))',
+                    }}
+                  >
+                    <Crest url={teams[id]?.escudo ?? ''} alt={teams[id]?.displayName ?? id} className="w-5 h-5" />
+                  </span>
+                ))}
+              </span>
+            ) : (
+              selectedTeams.map((id) => (
+                <Crest key={id} url={teams[id]?.escudo ?? ''} alt={teams[id]?.displayName ?? id} className="w-5 h-5" />
+              ))
+            )}
+            {selectedTeams.length === 1 && (
+              // The standings row already shows who's selected, so skip the name on narrow screens.
+              <span className="hidden sm:inline truncate max-w-[96px]">{selectedTeamNames}</span>
+            )}
+          </span>
+          {/* Always shown so the filter is discoverable; grey while off, lit while on. */}
+          <svg
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            className={`w-3 h-3 shrink-0 transition-colors duration-300 ${
+              focusActive ? '' : 'text-gray-500 group-hover:text-gray-300'
+            }`}
+            aria-hidden="true"
+          >
+            <path d="M2 3h12l-4.5 5.25V13l-3-1.5V8.25L2 3z" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={() => setSelectedTeams([])}
+          title="Limpar seleção"
+          aria-label="Limpar seleção"
+          className={`flex items-center justify-center w-9 rounded-r-full border-l cursor-pointer transition-colors ${
+            focusActive
+              ? 'border-blue-500/30 hover:text-blue-200'
+              : 'border-gray-700 hover:text-white'
+          }`}
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+    );
+  }
+
+  // Browsers can't Tab into a collapsed <details>, so when Tab (or Shift+Tab)
+  // leaves the last (or first) score input of a round, expand the next (or
+  // previous) round that still has games to decide and move focus into it.
+  // Fully played rounds are skipped, and navigation wraps around both ways:
+  // Tab past the very last game goes to the first round, Shift+Tab before the
+  // first game goes to the last one.
+  function handleRoundsKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key !== 'Tab' || !(e.target instanceof HTMLInputElement)) return;
+    const current = e.target.closest('details');
+    if (!current) return;
+    const tabbable = 'input:not([tabindex="-1"])';
+    const inputs = current.querySelectorAll<HTMLInputElement>(tabbable);
+    const edge = e.shiftKey ? inputs[0] : inputs[inputs.length - 1];
+    if (edge !== e.target) return;
+
+    const undecided = Array.from(e.currentTarget.querySelectorAll('details')).filter((d) => d.querySelector(tabbable));
+    const index = undecided.indexOf(current);
+    if (index === -1) return;
+    const target = undecided[(index + (e.shiftKey ? -1 : 1) + undecided.length) % undecided.length];
+
+    e.preventDefault();
+    target.open = true;
+    const targetInputs = target.querySelectorAll<HTMLInputElement>(tabbable);
+    (e.shiftKey ? targetInputs[targetInputs.length - 1] : targetInputs[0]).focus();
   }
 
   const rounds = useMemo(() => {
@@ -499,83 +744,23 @@ export function LeagueSimulator({
           <p className="text-xs text-gray-500">Rodada atual: {meta.currentRound} de {meta.totalRounds}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {selectedTeams.length > 0 && (
-            <button
-              onClick={() => setSelectedTeams([])}
-              className="flex items-center gap-1.5 h-9 text-sm pl-2 pr-3 rounded-full border border-blue-500/50 bg-blue-500/10 text-blue-300 shadow-[0_0_14px_-2px_rgb(59_130_246/0.45)] hover:border-blue-400 hover:text-blue-200 cursor-pointer transition-all shrink-0"
-              title={`Limpar destaque: ${selectedTeams.map((id) => teams[id]?.displayName ?? id).join(', ')}`}
-            >
-              {selectedTeams.length >= 3 ? (
-                // Overlap and fan the crests out like a hand of cards so many teams still fit.
-                // drop-shadow follows each crest's transparent silhouette: the tight dark
-                // shadows act as a die-cut outline separating overlapping crests, and the
-                // soft offset one falls onto the crest underneath to give the stack depth.
-                <span className="flex items-center -space-x-2">
-                  {selectedTeams.map((id, i) => (
-                    <span
-                      key={id}
-                      className="inline-flex"
-                      style={{
-                        transform: `rotate(${(i - (selectedTeams.length - 1) / 2) * 8}deg)`,
-                        filter:
-                          'drop-shadow(0 0 0.5px rgb(3 7 18)) drop-shadow(0 0 0.5px rgb(3 7 18)) drop-shadow(-2px 1px 2px rgb(0 0 0 / 0.55))',
-                      }}
-                    >
-                      <Crest url={teams[id]?.escudo ?? ''} alt={teams[id]?.displayName ?? id} className="w-5 h-5" />
-                    </span>
-                  ))}
-                </span>
-              ) : (
-                selectedTeams.map((id) => (
-                  <Crest key={id} url={teams[id]?.escudo ?? ''} alt={teams[id]?.displayName ?? id} className="w-5 h-5" />
-                ))
-              )}
-              {selectedTeams.length === 1 && (
-                <span className="truncate max-w-[96px]">{teams[selectedTeams[0]]?.displayName ?? selectedTeams[0]}</span>
-              )}
-              <span aria-hidden="true">×</span>
-            </button>
-          )}
-          {selectedTeams.length > 0 && (
-            <button
-              type="button"
-              role="switch"
-              aria-checked={focusFutureRounds}
-              onClick={() => setFocusFutureRounds((v) => !v)}
-              title="Abrir as rodadas futuras e mostrar só os jogos dos times selecionados"
-              className={`flex items-center gap-2 h-9 pl-3 pr-1.5 rounded-full border text-xs cursor-pointer transition-all duration-300 shrink-0 ${
-                focusFutureRounds
-                  ? 'border-blue-500/50 bg-blue-500/10 text-blue-200 shadow-[0_0_14px_-2px_rgb(59_130_246/0.45)] hover:border-blue-400'
-                  : 'border-gray-600 text-gray-300 hover:border-white hover:text-white'
-              }`}
-            >
-              <span className="hidden sm:inline">{selectedTeams.length > 1 ? 'Focar times' : 'Focar time'}</span>
-              {/* Recessed track when off, glossy gradient with a top highlight when on. */}
-              <span
-                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 shrink-0 ${
-                  focusFutureRounds
-                    ? 'bg-gradient-to-b from-blue-400 to-blue-600 shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_0_8px_rgb(59_130_246/0.5)]'
-                    : 'bg-gray-800 shadow-[inset_0_1px_3px_rgb(0_0_0/0.6)] ring-1 ring-inset ring-white/5'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 rounded-full bg-gradient-to-b from-white to-gray-200 shadow-[0_1px_3px_rgb(0_0_0/0.45)] transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
-                    focusFutureRounds ? 'translate-x-[18px]' : 'translate-x-0.5'
-                  }`}
-                />
-              </span>
-            </button>
-          )}
-          <DonateModal />
+          {selectedTeams.length > 0 && <div className="hidden sm:flex">{renderTeamPill()}</div>}
+          {/* On mobile these secondary actions move into the menu below. */}
+          <DonateModal open={donateOpen} onOpenChange={setDonateOpen} triggerClassName="hidden sm:flex" />
           <button
             onClick={() => setConfirmResetOpen(true)}
             disabled={!hasAnySimulation}
-            className="flex items-center h-9 text-sm px-4 rounded-full border border-gray-600 text-gray-300 transition-all shrink-0
+            className="hidden sm:flex items-center h-9 text-sm px-4 rounded-full border border-gray-600 text-gray-300 transition-all shrink-0
               enabled:hover:border-white enabled:hover:text-white enabled:cursor-pointer
               disabled:opacity-30 disabled:cursor-default"
           >
             Resetar
           </button>
+          <MobileMenu
+            canReset={hasAnySimulation}
+            onDonate={() => setDonateOpen(true)}
+            onReset={() => setConfirmResetOpen(true)}
+          />
         </div>
       </header>
 
@@ -594,9 +779,25 @@ export function LeagueSimulator({
             selectedTeams={selectedTeams}
             onSelectTeam={handleSelectTeam}
           />
+          {selectedTeams.length > 0 && (
+            // On mobile the selection sits right below the standings instead of
+            // competing with the title for the header's narrow width.
+            <div className="sm:hidden flex items-center gap-3 mt-3">
+              {renderTeamPill()}
+              {/* Touch screens have no tooltip, so briefly spell out what the filter now shows. */}
+              <span
+                role="status"
+                className={`min-w-0 truncate text-xs text-gray-400 transition-opacity duration-300 ${
+                  focusHint.visible ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                {focusHint.text}
+              </span>
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3" onKeyDown={handleRoundsKeyDown}>
           {rounds.map((round) => {
             const isFutureRound = round > meta.currentRound;
             return (

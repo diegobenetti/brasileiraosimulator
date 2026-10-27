@@ -3,8 +3,19 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
-export function DonateModal() {
-  const [open, setOpen] = useState(false);
+export function DonateModal({
+  open: openProp,
+  onOpenChange,
+  triggerClassName = 'flex',
+}: {
+  // Pass open/onOpenChange to also open the modal from elsewhere (e.g. the mobile menu).
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  triggerClassName?: string;
+} = {}) {
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = onOpenChange ?? setOpenState;
   const [returnBase, setReturnBase] = useState('');
 
   useEffect(() => {
@@ -16,7 +27,7 @@ export function DonateModal() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Me pague um café"
-        className="donate-button flex items-center gap-1.5 h-9 pl-4 pr-4 sm:pr-4.5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 text-white transition-transform hover:scale-105 hover:from-pink-400 hover:to-rose-500 cursor-pointer"
+        className={`donate-button ${triggerClassName} items-center gap-1.5 h-9 pl-4 pr-4 sm:pr-4.5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 text-white transition-transform hover:scale-105 hover:from-pink-400 hover:to-rose-500 cursor-pointer`}
       >
         <span className="hidden sm:inline text-sm font-medium">Me pague um café</span>
         <span className="donate-heart text-base leading-none">☕</span>
