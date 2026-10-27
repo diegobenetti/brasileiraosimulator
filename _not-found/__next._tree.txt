@@ -1,2 +1,2 @@
-:HL["/brasileiraosimulator/_next/static/chunks/15d266p2tlweo.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"nCs20a5oSp-knX-qiWGfY"}
+:HL["/brasileiraosimulator/_next/static/chunks/2mlw-nj0-2klj.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"TbfZvPuc7Do48kwbc45nC"}
