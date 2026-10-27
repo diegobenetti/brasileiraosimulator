@@ -44,9 +44,9 @@ function formatMatchDate(iso: string | null, time: string | null): string {
 
 // ── Sub-components ──────────────────────────────────────────────────────────
 
-function Crest({ url, alt }: { url: string; alt: string }) {
+function Crest({ url, alt, className = 'w-6 h-6' }: { url: string; alt: string; className?: string }) {
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={url} alt={alt} className="w-6 h-6 object-contain shrink-0" loading="lazy" />;
+  return <img src={url} alt={alt} className={`${className} object-contain shrink-0`} loading="lazy" />;
 }
 
 function ScoreInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -502,12 +502,34 @@ export function LeagueSimulator({
           {selectedTeams.length > 0 && (
             <button
               onClick={() => setSelectedTeams([])}
-              className="flex items-center gap-1.5 h-9 text-sm pl-2 pr-3 rounded-full border border-blue-500/50 bg-blue-500/10 text-blue-300 hover:border-blue-400 hover:text-blue-200 cursor-pointer transition-all shrink-0"
+              className="flex items-center gap-1.5 h-9 text-sm pl-2 pr-3 rounded-full border border-blue-500/50 bg-blue-500/10 text-blue-300 shadow-[0_0_14px_-2px_rgb(59_130_246/0.45)] hover:border-blue-400 hover:text-blue-200 cursor-pointer transition-all shrink-0"
               title={`Limpar destaque: ${selectedTeams.map((id) => teams[id]?.displayName ?? id).join(', ')}`}
             >
-              {selectedTeams.map((id) => (
-                <Crest key={id} url={teams[id]?.escudo ?? ''} alt={teams[id]?.displayName ?? id} />
-              ))}
+              {selectedTeams.length >= 3 ? (
+                // Overlap and fan the crests out like a hand of cards so many teams still fit.
+                // drop-shadow follows each crest's transparent silhouette: the tight dark
+                // shadows act as a die-cut outline separating overlapping crests, and the
+                // soft offset one falls onto the crest underneath to give the stack depth.
+                <span className="flex items-center -space-x-2">
+                  {selectedTeams.map((id, i) => (
+                    <span
+                      key={id}
+                      className="inline-flex"
+                      style={{
+                        transform: `rotate(${(i - (selectedTeams.length - 1) / 2) * 8}deg)`,
+                        filter:
+                          'drop-shadow(0 0 0.5px rgb(3 7 18)) drop-shadow(0 0 0.5px rgb(3 7 18)) drop-shadow(-2px 1px 2px rgb(0 0 0 / 0.55))',
+                      }}
+                    >
+                      <Crest url={teams[id]?.escudo ?? ''} alt={teams[id]?.displayName ?? id} className="w-5 h-5" />
+                    </span>
+                  ))}
+                </span>
+              ) : (
+                selectedTeams.map((id) => (
+                  <Crest key={id} url={teams[id]?.escudo ?? ''} alt={teams[id]?.displayName ?? id} className="w-5 h-5" />
+                ))
+              )}
               {selectedTeams.length === 1 && (
                 <span className="truncate max-w-[96px]">{teams[selectedTeams[0]]?.displayName ?? selectedTeams[0]}</span>
               )}
@@ -521,17 +543,24 @@ export function LeagueSimulator({
               aria-checked={focusFutureRounds}
               onClick={() => setFocusFutureRounds((v) => !v)}
               title="Abrir as rodadas futuras e mostrar só os jogos dos times selecionados"
-              className="flex items-center gap-1.5 h-9 pl-3 pr-1.5 rounded-full border border-gray-600 text-gray-300 text-xs hover:border-white hover:text-white cursor-pointer transition-all shrink-0"
+              className={`flex items-center gap-2 h-9 pl-3 pr-1.5 rounded-full border text-xs cursor-pointer transition-all duration-300 shrink-0 ${
+                focusFutureRounds
+                  ? 'border-blue-500/50 bg-blue-500/10 text-blue-200 shadow-[0_0_14px_-2px_rgb(59_130_246/0.45)] hover:border-blue-400'
+                  : 'border-gray-600 text-gray-300 hover:border-white hover:text-white'
+              }`}
             >
-              <span className="hidden sm:inline">Focar time</span>
+              <span className="hidden sm:inline">{selectedTeams.length > 1 ? 'Focar times' : 'Focar time'}</span>
+              {/* Recessed track when off, glossy gradient with a top highlight when on. */}
               <span
-                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
-                  focusFutureRounds ? 'bg-blue-500' : 'bg-gray-700'
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 shrink-0 ${
+                  focusFutureRounds
+                    ? 'bg-gradient-to-b from-blue-400 to-blue-600 shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_0_8px_rgb(59_130_246/0.5)]'
+                    : 'bg-gray-800 shadow-[inset_0_1px_3px_rgb(0_0_0/0.6)] ring-1 ring-inset ring-white/5'
                 }`}
               >
                 <span
-                  className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                    focusFutureRounds ? 'translate-x-4' : 'translate-x-1'
+                  className={`inline-block h-4 w-4 rounded-full bg-gradient-to-b from-white to-gray-200 shadow-[0_1px_3px_rgb(0_0_0/0.45)] transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+                    focusFutureRounds ? 'translate-x-[18px]' : 'translate-x-0.5'
                   }`}
                 />
               </span>
