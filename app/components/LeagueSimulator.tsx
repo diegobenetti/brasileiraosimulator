@@ -12,7 +12,9 @@ import {
   type StandingRow,
   type Team,
 } from '../lib/standings';
+import { getZone, type ZoneId } from '../lib/share';
 import { DonateModal } from './DonateModal';
+import { ShareModal } from './ShareModal';
 
 interface Meta {
   year: number;
@@ -24,12 +26,18 @@ interface Meta {
 
 // ── Zones (Libertadores / Sudamericana / Rebaixamento) ─────────────────────
 
+// Zone boundaries live in lib/share.ts so the table and the share card agree.
+const ZONE_CLASSES: Record<ZoneId, string> = {
+  champion: 'border-l-4 border-l-emerald-500',
+  libertadores: 'border-l-4 border-l-emerald-500',
+  'pre-libertadores': 'border-l-4 border-l-yellow-500',
+  mid: 'border-l-4 border-l-transparent',
+  sudamericana: 'border-l-4 border-l-sky-500',
+  relegation: 'border-l-4 border-l-red-500',
+};
+
 function zoneClass(position: number): string {
-  if (position <= 4) return 'border-l-4 border-l-emerald-500';
-  if (position <= 6) return 'border-l-4 border-l-yellow-500';
-  if (position <= 12) return 'border-l-4 border-l-transparent';
-  if (position <= 16) return 'border-l-4 border-l-sky-500';
-  return 'border-l-4 border-l-red-500';
+  return ZONE_CLASSES[getZone(position).id];
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -47,6 +55,14 @@ function formatMatchDate(iso: string | null, time: string | null): string {
 function Crest({ url, alt, className = 'w-6 h-6' }: { url: string; alt: string; className?: string }) {
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={url} alt={alt} className={`${className} object-contain shrink-0`} loading="lazy" />;
+}
+
+function ShareIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6" />
+    </svg>
+  );
 }
 
 function ScoreInput({
@@ -470,6 +486,7 @@ export function LeagueSimulator({
   const [hydrated, setHydrated] = useState(false);
   const [confirmResetOpen, setConfirmResetOpen] = useState(false);
   const [donateOpen, setDonateOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
   const [focusFutureRounds, setFocusFutureRounds] = useState(false);
   // The toggle only makes sense while a team is highlighted, so ignore any
@@ -745,6 +762,15 @@ export function LeagueSimulator({
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {selectedTeams.length > 0 && <div className="hidden sm:flex">{renderTeamPill()}</div>}
+          <button
+            type="button"
+            onClick={() => setShareOpen(true)}
+            className="hidden sm:flex items-center gap-1.5 h-9 text-sm px-4 rounded-full bg-green-500 text-gray-950 font-bold
+              hover:bg-green-400 cursor-pointer transition-colors shrink-0"
+          >
+            <ShareIcon />
+            Compartilhar
+          </button>
           {/* On mobile these secondary actions move into the menu below. */}
           <DonateModal open={donateOpen} onOpenChange={setDonateOpen} triggerClassName="hidden sm:flex" />
           <button
@@ -795,7 +821,26 @@ export function LeagueSimulator({
               </span>
             </div>
           )}
+          {/* On desktop this lives in the header: below the sticky table it falls off short screens. */}
+          <button
+            type="button"
+            onClick={() => setShareOpen(true)}
+            className="sm:hidden mt-3 w-full flex items-center justify-center gap-2 h-10 rounded-full bg-green-500 text-gray-950 text-sm font-bold
+              hover:bg-green-400 active:scale-[0.98] cursor-pointer transition-all touch-manipulation"
+          >
+            <ShareIcon />
+            Compartilhar projeção
+          </button>
         </div>
+
+        {shareOpen && (
+          <ShareModal
+            standings={standings}
+            teams={teams}
+            initialTeamId={selectedTeams[0]}
+            onClose={() => setShareOpen(false)}
+          />
+        )}
 
         <div className="flex flex-col gap-3" onKeyDown={handleRoundsKeyDown}>
           {rounds.map((round) => {
