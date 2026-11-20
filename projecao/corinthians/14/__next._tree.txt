@@ -1,0 +1,5 @@
+:HL["/brasileiraosimulator/_next/static/chunks/3h51sjd0ckp_4.css","style"]
+:HL["/brasileiraosimulator/_next/static/media/797e433ab948586e-s.p.0r6juujl39pe6.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/brasileiraosimulator/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["https://s.sde.globo.com/media/organizations/2024/10/09/Corinthians_2024_Q4ahot4.svg","image"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"projecao","param":null,"prefetchHints":0,"slots":{"children":{"name":"time","param":{"type":"d","key":"corinthians","siblings":null},"prefetchHints":0,"slots":{"children":{"name":"posicao","param":{"type":"d","key":"14","siblings":null},"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}}}},"staleTime":300,"buildId":"swWPJ2tbtlNCX3LnU8usy"}

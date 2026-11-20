@@ -1,0 +1,1 @@
+self.__SSG_MANIFEST=new Set(["\u002Fprojecao\u002F[time]\u002F[posicao]","\u002Fprojecao\u002F[time]\u002F[posicao]\u002Fcard.png"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()
